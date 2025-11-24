@@ -1,0 +1,107 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vephan <vephan@student.42lausanne.ch>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/10 08:46:34 by vephan            #+#    #+#             */
+/*   Updated: 2025/10/10 17:05:11 by vephan           ###   ########.ch       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libft.h"
+/* allocate ptr, cpy and store*/
+char	*ft_allocptr(char *src, int len)
+{
+	char	*s;
+
+	s = (char *) malloc(sizeof(char) * (len + 1));
+	if (!s)
+		return (NULL);
+	ft_memcpy(s, src, len); 
+	s[len] = '\0';
+	return (s);
+}
+
+char	**ft_allocarray(int	cnt)
+{
+	char	**arr;
+	char	*ptr;
+	
+	arr = (void *) malloc(sizeof(ptr) * (cnt + 1)); // accounts for 1 null ptr
+	if (!arr)
+		return (NULL);
+	return (arr);	
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**arr;
+	char	*str; 
+	char	*ptr; 
+	char	*tmp;
+	int	cnt; //cnt = counts the number of strings in s
+	int	j;
+	int	len;
+	
+	//trim the string in order to have only valid strings
+	ptr = ft_strtrim(s, &c);
+	cnt = 0; 
+	if (ptr && *ptr != '\0')
+	{
+		str = ptr;
+		while ((ft_strlen(str) > 0) && (ft_strnpchr(str, c) != NULL))
+		{
+			len = (int) (ft_strnpchr(str, c) - str);
+			if (len >= 1)
+				cnt++;
+			str = ft_strnpchr(str, c) + 1; //points after c
+		}
+		//add one string if c is not last char
+		cnt++;
+	}
+	arr = ft_allocarray(cnt);
+	if (!arr)
+		return (NULL);
+	//now split and store in arr
+	j = 0;
+	str = ptr;
+	while (j < cnt)
+	{
+		//skip all c
+		while ((*str != '\0') && (*str == c))
+			str++;
+		if (j < (cnt - 1))
+			len = (int)(ft_strnpchr(str, c) - str);
+		else
+			len = ft_strlen(str);
+		tmp = ft_allocptr(str, len);
+		arr[j] = tmp;			
+		str = ft_strnpchr(str, c) + 1;	
+		j++;
+	}
+	if (ptr) //if (ptr && *ptr != '\0')	
+		free(ptr); //do we have to check if ptr !=0
+	//last string
+	arr[cnt] = NULL;
+	return (arr);
+}
+/*
+#include <stdio.h>
+int main(void)
+{
+	char	*s = "      split       this for   me  !       ";
+	char	c = ' ';
+	char	**result;
+	int		i;
+
+	result = ft_split(s, c);
+	i = 0;
+	while (i < 6)
+	{
+		printf("result[%d] = %s\n", i, result[i]);
+		i++;	
+	}
+	return (0);
+}*/
